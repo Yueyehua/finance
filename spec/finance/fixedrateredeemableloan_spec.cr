@@ -7,7 +7,15 @@ describe Finance::FixedRateRedeemableLoan do
     bc.should eq 199.96
   end
   it "returns the lean amortizing schedule given fund, rate and duration." do
-    # TODO:
+    t = Time.new(2019, 2, 1)
+    ls = Finance::FixedRateRedeemableLoan.loan_schedule(10.0, 0.01, 3, t)
+    ls.should be_a Array({Time, Int32, Int32, Float64, Float64, Float64})
+    ls.should eq [
+      {Time.new(2019, 2, 1), 0, 0, 0.0, 0.0, 10.0},
+      {Time.new(2019, 3, 1), 0, 0, 3.34, 0.01, 6.67},
+      {Time.new(2019, 4, 1), 0, 1, 3.34, 0.01, 3.34},
+      {Time.new(2019, 5, 1), 0, 2, 3.34, 0.0, 0.0}
+    ]
   end
   it "returns the monthly interests given remainder and monthly rate." do
     mi = Finance::FixedRateRedeemableLoan.monthly_interests(100, 0.01)

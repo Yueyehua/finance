@@ -20,8 +20,18 @@ module Finance
     # ```
     # Finance::FixedRateRedeemableLoan.loan_schedule(100, 0.12, 12)
     # ```
-    def loan_schedule(fund : Float64, rate : Float64, duration : Int32)
-      # TODO:
+    def loan_schedule(fund : Float64, rate : Float64, duration : Int32,
+      date = Time.now)
+      # TODO: array of {date, nthyear, mthmonth, interests, remainder}
+      schedule = [{date, 0, 0, 0.0, 0.0, fund}]
+      monthly_due = monthly_payment(fund, rate, duration)
+      duration.times do |i|
+        remainder = schedule.last.last
+        target_date = schedule.last.first + 1.month
+        line = schedule_line(remainder, rate, monthly_due, target_date, i)
+        schedule.push line
+      end
+      schedule
     end
 
     # Returns the monthly interests due given the remainder and
@@ -65,6 +75,15 @@ module Finance
     def total_cost(fund : Float64, rate : Float64, duration : Int32)
       mp = monthly_payment(fund, rate, duration)
       (mp * duration - fund).round(2)
+    end
+
+    # :nodoc:
+    private def schedule_line(asset, rate, payment, date, iteration)
+      nth_year = iteration / 12
+      nth_month = iteration % 12
+      interests = monthly_interests(asset, monthly_rate(rate))
+      remainder = (asset + interests - payment).round(2)
+      { date, nth_year, nth_month, payment, interests, remainder }
     end
   end
 end
