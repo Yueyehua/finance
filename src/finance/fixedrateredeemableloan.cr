@@ -10,7 +10,7 @@ module Finance
     # Finance::FixedRateRedeemableLoan.borrowing_cap(1, 0.12, 12) # => 11.26
     # ```
     def borrowing_cap(capacity : Float64, rate : Float64, duration : Int32)
-      r = monthly_rate(rate)
+      r = Finance::Math.periodic_rate(rate, 12)
       (capacity * ((1 - (1 + r) ** -(duration)) / r)).round(2)
     end
 
@@ -21,27 +21,16 @@ module Finance
     # Finance::FixedRateRedeemableLoan.loan_schedule(100, 0.12, 12)
     # ```
     def loan_schedule(fund : Float64, rate : Float64, duration : Int32,
-      date = Time.now)
-      # TODO: array of {date, nthyear, mthmonth, interests, remainder}
+                      date = Time.now)
       schedule = [{date, 0, 0, 0.0, 0.0, fund}]
-      monthly_due = monthly_payment(fund, rate, duration)
+      due = monthly_payment(fund, rate, duration)
       duration.times do |i|
         remainder = schedule.last.last
         target_date = schedule.last.first + 1.month
-        line = schedule_line(remainder, rate, monthly_due, target_date, i)
+        line = schedule_line(remainder, rate, due, target_date, i, duration)
         schedule.push line
       end
       schedule
-    end
-
-    # Returns the monthly interests due given the remainder and
-    # the monthly rate.
-    #
-    # ```
-    # Finance::FixedRateRedeemableLoan.monthly_interests(100, 0.01) # => 1.0
-    # ```
-    def monthly_interests(remainder : Float64, monthly_rate : Float64)
-      (remainder * monthly_rate).round(2)
     end
 
     # Returns the monthly payment due given the fund borrowed, the yearly rate
@@ -51,18 +40,8 @@ module Finance
     # Finance::FixedRateRedeemableLoan.monthly_payment(100, 0.12, 12) # => 8.88
     # ```
     def monthly_payment(fund : Float64, rate : Float64, duration : Int32)
-      r = monthly_rate(rate)
+      r = Finance::Math.periodic_rate(rate, 12)
       (fund * (r / (1 - (1 + r) ** -(duration)))).round(2)
-    end
-
-    # Returns the monthly rate given the yearly rate.
-    #
-    # ```
-    # Finance::FixedRateRedeemableLoan.monthly_rate(0.12) # => 0.01
-    # ```
-    def monthly_rate(rate : Float64)
-      # Alternative formula: Finance::Math.nthrt(12, 1.0 + yearly_rate) - 1
-      rate / 12
     end
 
     # Returns the total cost of the loan, i.e. the sum of all the monthly
@@ -78,12 +57,15 @@ module Finance
     end
 
     # :nodoc:
-    private def schedule_line(asset, rate, payment, date, iteration)
-      nth_year = iteration / 12
-      nth_month = iteration % 12
-      interests = monthly_interests(asset, monthly_rate(rate))
+    private def schedule_line(asset, rate, payment, date, iterator, duration)
+      nth_year = iterator / 12
+      nth_month = iterator % 12
+      monthly_rate = Finance::Math.periodic_rate(rate, 12)
+      interests = Finance::Math.periodic_interests(asset, monthly_rate)
       remainder = (asset + interests - payment).round(2)
-      { date, nth_year, nth_month, payment, interests, remainder }
+      due = iterator + 1 != duration ? payment : (payment + remainder).round(2)
+      rem = iterator + 1 != duration ? remainder : 0.0
+      {date, nth_year, nth_month, due, interests, rem}
     end
   end
 end

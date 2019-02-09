@@ -14,27 +14,17 @@ describe Finance::FixedRateRedeemableLoan do
       {Time.new(2019, 2, 1), 0, 0, 0.0, 0.0, 10.0},
       {Time.new(2019, 3, 1), 0, 0, 3.34, 0.01, 6.67},
       {Time.new(2019, 4, 1), 0, 1, 3.34, 0.01, 3.34},
-      {Time.new(2019, 5, 1), 0, 2, 3.34, 0.0, 0.0}
+      {Time.new(2019, 5, 1), 0, 2, 3.34, 0.0, 0.0},
     ]
-  end
-  it "returns the monthly interests given remainder and monthly rate." do
-    mi = Finance::FixedRateRedeemableLoan.monthly_interests(100, 0.01)
-    mi.should be_a Float64
-    mi.should eq 1
   end
   it "returns the monthly payment given fund, rate and duration." do
     mp = Finance::FixedRateRedeemableLoan.monthly_payment(200, 0.075, 36)
     mp.should be_a Float64
     mp.should eq 6.22
   end
-  it "returns the monthly rate depending on yearly rate." do
-    mr = Finance::FixedRateRedeemableLoan.monthly_rate(0.12)
-    mr.should be_a Float64
-    mr.should eq 0.01
-  end
   it "returns the sum of all the interests given fund, rate and duration." do
     tc = Finance::FixedRateRedeemableLoan.total_cost(200, 0.075, 36)
     tc.should be_a Float64
-    tc. should eq 23.92
+    tc.should eq 23.92
   end
 end
