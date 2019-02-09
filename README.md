@@ -11,7 +11,7 @@ This is a simple lib to apply financial formulas using Crystal-lang.
 ```yaml
 dependencies:
   finance:
-    github: your-github-user/finance
+    github: Yueyehua/finance
 ```
 2. Run `shards install`
 
@@ -46,5 +46,5 @@ WIP
 [travis-url]: https://travis-ci.org/Yueyehua/finance
 [license-img]: https://img.shields.io/badge/License-MIT-blue.svg
 [license-url]: LICENSE
-[docs-img]: https://img.shields.io/readthedocs/finance.svg
+[docs-img]: https://img.shields.io/readthedocs/docs.svg
 [docs-url]: https://yueyehua.github.io/finance/
