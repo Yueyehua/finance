@@ -1,13 +1,13 @@
 module Finance
   # Collection of formulas used for a fixed rate redeemable loan.
-  module FixedRateRedeemableLoan
+  module Loan
     extend self
 
     # Returns the borrowing capacity given the monthly payment capacity,
     # the yearly rate and the duration of the loan in month.
     #
     # ```
-    # Finance::FixedRateRedeemableLoan.borrowing_cap(1, 0.12, 12) # => 11.26
+    # Finance::Loan.borrowing_cap(1, 0.12, 12) # => 11.26
     # ```
     def borrowing_cap(capacity : Float64, rate : Float64, duration : Int32)
       r = Finance::Math.periodic_rate(rate, 12)
@@ -18,7 +18,7 @@ module Finance
     # the duration of the loan in month.
     #
     # ```
-    # Finance::FixedRateRedeemableLoan.loan_schedule(100, 0.12, 12)
+    # Finance::Loan.loan_schedule(100, 0.12, 12)
     # ```
     def loan_schedule(fund : Float64, rate : Float64, duration : Int32,
                       date = Time.now)
@@ -37,7 +37,7 @@ module Finance
     # and the duration of the loan in month.
     #
     # ```
-    # Finance::FixedRateRedeemableLoan.monthly_payment(100, 0.12, 12) # => 8.88
+    # Finance::Loan.monthly_payment(100, 0.12, 12) # => 8.88
     # ```
     def monthly_payment(fund : Float64, rate : Float64, duration : Int32)
       r = Finance::Math.periodic_rate(rate, 12)
@@ -49,7 +49,7 @@ module Finance
     # of the loan in month.
     #
     # ```
-    # Finance::FixedRateRedeemableLoan.total_cost(100, 0.12, 12) # => 6.56
+    # Finance::Loan.total_cost(100, 0.12, 12) # => 6.56
     # ```
     def total_cost(fund : Float64, rate : Float64, duration : Int32)
       mp = monthly_payment(fund, rate, duration)

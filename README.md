@@ -23,7 +23,7 @@ require "finance"
 
 All functions are usable as is, i.e.:
 ```crystal
-Finance::FixedRateRedeemableLoan.loan_schedule(1000, 0.02, 24)
+Finance::Loan.loan_schedule(1000, 0.02, 24)
 ```
 
 ## Development
